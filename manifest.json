@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "IMGecko",
+    "version": "1.0",
+    "description": "A chrome extension for converting and saving images as png / jpg",
+    "permissions": ["contextMenus", "offscreen"],
+    "host_permissions": ["<all_urls>"],
+    "background": {
+        "service_worker": "src/scripts/menu_script.js"
+    },
+    "icons": {
+        "16": "src/icons/IMGeckoIcon16pxLight.png",
+        "32": "src/icons/IMGeckoIcon32pxLight.png",
+        "48": "src/icons/IMGeckoIcon48pxLight.png",
+        "128": "src/icons/IMGeckoIcon128pxLight.png"
+    }
+}

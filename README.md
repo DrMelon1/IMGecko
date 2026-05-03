@@ -1,2 +1,2 @@
 # IMGecko
-wip chrome extension allowing users to select the filetype of an image that they want to save.
+A chrome extension for converting and saving images as png / jpg.
