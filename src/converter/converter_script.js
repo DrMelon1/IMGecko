@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
             const response = await fetch(url);
             const blob = await response.blob();
             const base64data = await blobToBase64(blob);
-            convertToRaster(base64data, format, filename);
+            processImage(base64data, format, filename);
         } catch (error) {
             console.error("IMGecko Conversion Error:", error);
         }
@@ -22,7 +22,7 @@ function blobToBase64(blob) {
     });
 }
 
-function convertToRaster(base64, format, filename) {
+function processImage(base64, format, filename) {
     const img = new Image();
     img.src = base64;
     img.onload = () => {
@@ -37,15 +37,16 @@ function convertToRaster(base64, format, filename) {
         }
 
         ctx.drawImage(img, 0, 0);
-        const mime = format === 'jpg' ? 'image/jpeg' : `image/${format}`;
-        download(canvas.toDataURL(mime, 0.9), `${filename}.${format}`);
-    };
-}
+        const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
+        const dataUrl = canvas.toDataURL(mime, 0.9); // quality for jpg images
 
-function download(url, filename) {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    setTimeout(() => window.close(), 500);
+        chrome.runtime.sendMessage({
+            type: "downloadReady",
+            dataUrl: dataUrl,
+            filename: filename,
+            format: format
+        });
+
+        setTimeout(() => window.close(), 1000);
+    };
 }

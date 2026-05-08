@@ -29,7 +29,7 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
             await chrome.offscreen.createDocument({
                 url: "src/converter/converter_bridge.html",
                 reasons: ["DOM_PARSER"],
-                justification: "Offscreen doc for image conversion"
+                justification: "Image conversion via canvas"
             });
         }
 
@@ -37,7 +37,18 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
             type: "convertImage",
             url: info.srcUrl,
             format: format,
-            filename: "converted_image"
+            filename: `IMGecko_${Date.now()}`
+        });
+    }
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+    if (message.type === "downloadReady") {
+        chrome.downloads.download({
+            url: message.dataUrl,
+            filename: `${message.filename}.${message.format}`,
+            saveAs: false,
+            conflictAction: "uniquify"
         });
     }
 });
