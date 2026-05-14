@@ -1,5 +1,6 @@
 const formats = ["png", "jpg"];
 
+// context menu setup on install / update
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: "IMGeckoParent",
@@ -17,6 +18,7 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
+// chosen format validation and offscreen document management
 chrome.contextMenus.onClicked.addListener(async (info) => {
     const format = info.menuItemId.split("-")[1];
 

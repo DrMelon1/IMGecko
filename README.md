@@ -31,8 +31,8 @@ Example:
 > Depending on your browser the download will trigger but it might not show any notifications!<br>
 > This has been the case with Vivaldi but it's nothing to worry about as long as downloads still go through.
 
-
-
+### Extras
+- Restored the ability to right-click and save images from Instagram posts.
 
 
 

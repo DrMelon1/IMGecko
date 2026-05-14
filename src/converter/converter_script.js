@@ -1,3 +1,4 @@
+// fetch raw image data, convert to base64, and send to offscreen document for processing
 chrome.runtime.onMessage.addListener(async (message) => {
     if (message.type === "convertImage") {
         const { url, format, filename } = message;
