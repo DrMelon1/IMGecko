@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/icons/IMGeckoIcon128pxLight.png" width="128" alt="IMGecko Icon">
+  <img src="docs/IMGeckoIcon.png" width="128" alt="IMGecko Icon">
 </p>
 
 <h1 align="center">
