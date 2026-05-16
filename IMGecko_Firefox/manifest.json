@@ -7,7 +7,10 @@
     "host_permissions": ["<all_urls>"],
     "browser_specific_settings": {
         "gecko": {
-            "id": "imgecko@drmelon1.github.io"
+            "id": "imgecko@drmelon1.github.io",
+            "data_collection_permissions": {
+                "required": ["none"]
+            }
         }
     },
     "content_scripts": [
