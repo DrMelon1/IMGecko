@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "IMGecko",
     "version": "1.0",
-    "description": "A chrome extension for converting and saving images as .png or .jpg formats.",
+    "description": "An extension for converting and saving images as .png or .jpg formats.",
     "permissions": ["contextMenus", "offscreen", "downloads"],
     "host_permissions": ["<all_urls>"],
     "content_scripts": [

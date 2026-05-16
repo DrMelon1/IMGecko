@@ -6,19 +6,22 @@
   IMGecko
 </h1>
 <h3 align="center">
-  A chrome extension for converting and saving images as .png or .jpg formats.
+  An extension for converting and saving images as .png or .jpg formats.
 </h3>
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-1.0-green" alt="Version">
 </p>
 
-### Installation
+### Installation Guide (Chrome)
 1. Download this repository as a .zip file by pressing the `<> Code` button.
 2. Extract the folder containing the `manifest.json` file.
 3. Open your browser and go to `chrome://extensions/`.
 4. Enable **Developer mode**.
 5. Click **Load unpacked** and select the folder you extracted.
+
+### Installation Guide (Firefox)
+1. Coming soon...
 
 ### Usage
 The extension will add a new option to the context menu where you can choose your preferred image format.<br>
@@ -33,7 +36,4 @@ Example:
 
 ### Extras
 - Restored the ability to right-click and save images from Instagram posts.
-
-
-
 
