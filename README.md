@@ -20,8 +20,8 @@
 4. Enable **Developer mode**.
 5. Click **Load unpacked** and select the folder you extracted.
 
-### Installation Guide (Firefox)
-1. Coming soon...
+### Installation (Firefox)
+🡒 https://addons.mozilla.org/en-US/firefox/addon/imgecko/
 
 ### Usage
 The extension will add a new option to the context menu where you can choose your preferred image format.<br>
