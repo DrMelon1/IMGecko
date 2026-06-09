@@ -6,7 +6,7 @@
   IMGecko
 </h1>
 <h3 align="center">
-  An extension for converting and saving images as .png or .jpg formats.
+  An extension for converting and saving images as PNG, JPG, JPEG, JFIF, WebP, AVIF, GIF, BMP, ICO, TIFF, TGA, QOI, SVG, PCX, Netpbm, and other image formats.
 </h3>
 
 <p align="center">
@@ -32,4 +32,8 @@ Example:
 
 ### Extras
 - Restored the ability to right-click and save images from Instagram posts.
+- GIF output is static, not animated.
+- SVG output embeds the raster image, it does not vectorize it.
+- AVIF and JPEG XL appear only when the browser supports native canvas encoding for them.
+- Some legacy formats do not preserve transparency and are flattened against white.
 

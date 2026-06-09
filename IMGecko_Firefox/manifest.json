@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "IMGecko",
     "version": "1.0",
-    "description": "An extension for converting and saving images as .png or .jpg formats.",
+    "description": "Save images as PNG, JPG, WebP, AVIF, GIF, BMP, ICO, TIFF, TGA, QOI, SVG, PCX, Netpbm, and more.",
     "permissions": ["contextMenus", "downloads"],
     "host_permissions": ["<all_urls>"],
     "browser_specific_settings": {
@@ -21,7 +21,16 @@
         }
     ],
     "background": {
-        "scripts": ["src/scripts/menu_script.js"]
+        "scripts": [
+            "src/shared/format_registry.js",
+            "src/vendor/gifenc.min.js",
+            "src/shared/image_loader.js",
+            "src/shared/encoders/canvas_encoders.js",
+            "src/shared/encoders/binary_encoders.js",
+            "src/shared/encoders/text_encoders.js",
+            "src/shared/encoder_runtime.js",
+            "src/scripts/menu_script.js"
+        ]
     },
     "icons": {
         "16": "src/icons/IMGeckoIcon16pxLight.png",

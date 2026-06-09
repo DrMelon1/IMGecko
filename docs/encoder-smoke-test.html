@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IMGecko Encoder Smoke Test</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --background: #f5f5f4;
+            --surface: #ffffff;
+            --border: #d6d3d1;
+            --text: #1c1917;
+            --muted: #57534e;
+            --pass: #0f766e;
+            --fail: #b91c1c;
+            --skip: #92400e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--text);
+            font-family: system-ui, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        main {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        button {
+            border: 1px solid #1c1917;
+            border-radius: 8px;
+            background: #1c1917;
+            color: #ffffff;
+            cursor: pointer;
+            font: inherit;
+            padding: 8px 12px;
+        }
+
+        button:disabled {
+            cursor: wait;
+            opacity: 0.7;
+        }
+
+        .summary {
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .preview {
+            width: 256px;
+            max-width: 100%;
+            border: 1px solid var(--border);
+            background:
+                linear-gradient(45deg, #e7e5e4 25%, transparent 25%),
+                linear-gradient(-45deg, #e7e5e4 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #e7e5e4 75%),
+                linear-gradient(-45deg, transparent 75%, #e7e5e4 75%);
+            background-color: #ffffff;
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+            background-size: 16px 16px;
+        }
+
+        .summary-text {
+            max-width: 680px;
+        }
+
+        .summary-text p {
+            margin: 6px 0;
+            color: var(--muted);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+
+        th,
+        td {
+            padding: 9px 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: top;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #fafaf9;
+            font-weight: 650;
+        }
+
+        td.signature {
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .status-pass {
+            color: var(--pass);
+            font-weight: 650;
+        }
+
+        .status-fail {
+            color: var(--fail);
+            font-weight: 650;
+        }
+
+        .status-skip {
+            color: var(--skip);
+            font-weight: 650;
+        }
+
+        @media (max-width: 760px) {
+            header,
+            .summary {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            main {
+                padding: 16px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <strong>IMGecko encoder smoke test</strong>
+        <button id="run-test" type="button">Run encoders</button>
+    </header>
+
+    <main>
+        <section class="summary" aria-label="Smoke test source canvas">
+            <canvas id="source-canvas" class="preview" width="256" height="160"></canvas>
+            <div class="summary-text">
+                <strong id="test-status">Ready</strong>
+                <p>The test canvas includes transparent areas, semi-transparent gradients, hard edges, text, and one-pixel lines.</p>
+                <p>Each encoder must return a non-empty Blob. Formats with known magic bytes are checked against their expected signatures.</p>
+            </div>
+        </section>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Format</th>
+                    <th>Extension</th>
+                    <th>MIME</th>
+                    <th>Status</th>
+                    <th>Bytes</th>
+                    <th>Signature</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody id="results-body"></tbody>
+        </table>
+    </main>
+
+    <script src="../IMGecko_Chrome/src/shared/format_registry.js"></script>
+    <script src="../IMGecko_Chrome/src/vendor/gifenc.min.js"></script>
+    <script src="../IMGecko_Chrome/src/shared/image_loader.js"></script>
+    <script src="../IMGecko_Chrome/src/shared/encoders/canvas_encoders.js"></script>
+    <script src="../IMGecko_Chrome/src/shared/encoders/binary_encoders.js"></script>
+    <script src="../IMGecko_Chrome/src/shared/encoders/text_encoders.js"></script>
+    <script src="../IMGecko_Chrome/src/shared/encoder_runtime.js"></script>
+    <script>
+        const canvas = document.getElementById("source-canvas");
+        const ctx = canvas.getContext("2d");
+        const runButton = document.getElementById("run-test");
+        const statusText = document.getElementById("test-status");
+        const resultsBody = document.getElementById("results-body");
+
+        function drawSourceCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, "rgba(220, 38, 38, 0.78)");
+            gradient.addColorStop(0.52, "rgba(15, 118, 110, 0.58)");
+            gradient.addColorStop(1, "rgba(28, 25, 23, 0.92)");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(18, 18, 162, 92);
+
+            ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
+            ctx.fillRect(42, 38, 52, 52);
+
+            ctx.fillStyle = "rgba(0, 0, 0, 0.88)";
+            ctx.fillRect(112, 34, 82, 20);
+            ctx.fillRect(112, 66, 82, 20);
+
+            ctx.strokeStyle = "rgba(15, 23, 42, 1)";
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 16) {
+                ctx.beginPath();
+                ctx.moveTo(x + 0.5, 118);
+                ctx.lineTo(x + 0.5, 154);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = "rgba(15, 23, 42, 1)";
+            ctx.font = "700 20px system-ui, sans-serif";
+            ctx.fillText("IMG", 28, 142);
+            ctx.fillStyle = "rgba(245, 158, 11, 0.62)";
+            ctx.beginPath();
+            ctx.arc(210, 66, 34, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function hexSignature(bytes, length = 12) {
+            return Array.from(bytes.slice(0, length))
+                .map((byte) => byte.toString(16).padStart(2, "0"))
+                .join(" ");
+        }
+
+        function asciiPrefix(bytes, length) {
+            return Array.from(bytes.slice(0, length))
+                .map((byte) => byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ".")
+                .join("");
+        }
+
+        function hasPngSignature(bytes) {
+            return bytes[0] === 0x89 && asciiPrefix(bytes.slice(1), 3) === "PNG";
+        }
+
+        function checkSignature(formatId, bytes) {
+            const text16 = asciiPrefix(bytes, 16);
+
+            switch (formatId) {
+                case "png":
+                    return hasPngSignature(bytes);
+                case "gif":
+                    return text16.startsWith("GIF");
+                case "bmp":
+                    return text16.startsWith("BM");
+                case "qoi":
+                    return text16.startsWith("qoif");
+                case "farbfeld":
+                    return text16.startsWith("farbfeld");
+                case "ppm":
+                    return text16.startsWith("P6");
+                case "pgm":
+                    return text16.startsWith("P5");
+                case "pbm":
+                    return text16.startsWith("P4");
+                case "pam":
+                    return text16.startsWith("P7");
+                case "hdr":
+                    return text16.startsWith("#?RADIANCE");
+                case "svg":
+                    return text16.startsWith("<svg");
+                case "xbm":
+                    return text16.startsWith("#define");
+                case "xpm":
+                    return text16.startsWith("/* XPM */");
+                case "ico":
+                    return bytes[0] === 0 && bytes[1] === 0 && bytes[2] === 1 && bytes[3] === 0;
+                case "cur":
+                    return bytes[0] === 0 && bytes[1] === 0 && bytes[2] === 2 && bytes[3] === 0;
+                case "tiff":
+                case "tif":
+                    return (bytes[0] === 0x49 && bytes[1] === 0x49) || (bytes[0] === 0x4d && bytes[1] === 0x4d);
+                default:
+                    return true;
+            }
+        }
+
+        function addResult(format, status, size, signature, message) {
+            const row = document.createElement("tr");
+            const statusClass = status === "Pass" ? "status-pass" : status === "Skipped" ? "status-skip" : "status-fail";
+
+            row.innerHTML = `
+                <td>${format.label}</td>
+                <td>.${format.extension}</td>
+                <td>${format.mime}</td>
+                <td class="${statusClass}">${status}</td>
+                <td>${size || ""}</td>
+                <td class="signature">${signature || ""}</td>
+                <td>${message || ""}</td>
+            `;
+            resultsBody.appendChild(row);
+        }
+
+        async function runSmokeTest() {
+            runButton.disabled = true;
+            resultsBody.textContent = "";
+            statusText.textContent = "Running";
+
+            let passed = 0;
+            let failed = 0;
+            let skipped = 0;
+
+            for (const format of IMGeckoFormats.formats) {
+                try {
+                    if (format.support === "canvas-probed" && !(await IMGeckoFormats.isCanvasMimeSupported(format.mime))) {
+                        skipped++;
+                        addResult(format, "Skipped", "", "", "Native canvas encoding is not available in this browser.");
+                        continue;
+                    }
+
+                    const result = await IMGeckoEncoder.encode(canvas, format.id);
+                    const bytes = new Uint8Array(await result.blob.arrayBuffer());
+                    const signatureOk = checkSignature(format.id, bytes);
+
+                    if (result.blob.size > 0 && signatureOk) {
+                        passed++;
+                        addResult(format, "Pass", result.blob.size, hexSignature(bytes), "Blob is non-empty and signature checks passed.");
+                    } else {
+                        failed++;
+                        addResult(format, "Fail", result.blob.size, hexSignature(bytes), "Blob size or signature check failed.");
+                    }
+                } catch (error) {
+                    failed++;
+                    addResult(format, "Fail", "", "", error.message);
+                }
+            }
+
+            statusText.textContent = `${passed} passed, ${failed} failed, ${skipped} skipped`;
+            runButton.disabled = false;
+        }
+
+        drawSourceCanvas();
+        runButton.addEventListener("click", runSmokeTest);
+        runSmokeTest();
+    </script>
+</body>
+</html>

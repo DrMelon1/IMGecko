@@ -1,53 +1,57 @@
-// fetch raw image data, convert to base64, and send to offscreen document for processing
-chrome.runtime.onMessage.addListener(async (message) => {
-    if (message.type === "convertImage") {
-        const { url, format, filename } = message;
+const pendingDownloadUrls = new Set();
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "revokeDownloadUrl") {
+        const delayMs = Number.isFinite(message.delayMs) ? message.delayMs : 10000;
+
+        setTimeout(() => {
+            if (pendingDownloadUrls.has(message.url)) {
+                URL.revokeObjectURL(message.url);
+                pendingDownloadUrls.delete(message.url);
+            }
+        }, delayMs);
+
+        sendResponse({ ok: true });
+        return false;
+    }
+
+    if (message.type !== "convertImage") {
+        return false;
+    }
+
+    (async () => {
+        const { url, formatId, filename } = message;
+        let downloadUrl = null;
 
         try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const base64data = await blobToBase64(blob);
-            processImage(base64data, format, filename);
+            const canvas = await IMGeckoImageLoader.loadToCanvas(url);
+            const result = await IMGeckoEncoder.encode(canvas, formatId);
+            downloadUrl = URL.createObjectURL(result.blob);
+            pendingDownloadUrls.add(downloadUrl);
+
+            const downloadResponse = await chrome.runtime.sendMessage({
+                type: "downloadReady",
+                downloadUrl,
+                filename,
+                extension: result.extension,
+                revokeDownloadUrl: true
+            });
+
+            if (!downloadResponse || !downloadResponse.ok) {
+                throw new Error(downloadResponse && downloadResponse.error ? downloadResponse.error : "Download failed to start.");
+            }
+
+            sendResponse({ ok: true });
         } catch (error) {
-            console.error("IMGecko Conversion Error:", error);
+            if (downloadUrl && pendingDownloadUrls.has(downloadUrl)) {
+                URL.revokeObjectURL(downloadUrl);
+                pendingDownloadUrls.delete(downloadUrl);
+            }
+
+            console.error(`IMGecko Conversion Error [${formatId}]:`, error);
+            sendResponse({ ok: false, error: error.message });
         }
-    }
+    })();
+
+    return true;
 });
-
-function blobToBase64(blob) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-    });
-}
-
-function processImage(base64, format, filename) {
-    const img = new Image();
-    img.src = base64;
-    img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-
-        if (format === "jpg") {
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        ctx.drawImage(img, 0, 0);
-        const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
-        const dataUrl = canvas.toDataURL(mime, 0.9); // quality for jpg images
-
-        chrome.runtime.sendMessage({
-            type: "downloadReady",
-            dataUrl: dataUrl,
-            filename: filename,
-            format: format
-        });
-
-        setTimeout(() => window.close(), 1000);
-    };
-}

@@ -1,77 +1,78 @@
-const formats = ["png", "jpg"];
+const imgeckoBrowser = globalThis.browser || globalThis.chrome;
+const MENU_PARENT_ID = "IMGeckoParent";
+const MENU_ITEM_PREFIX = "IMGecko-";
 
-// context menu setup on install / update
-browser.runtime.onInstalled.addListener(() => {
-    browser.contextMenus.create({
-        id: "IMGeckoParent",
+async function buildContextMenus() {
+    await imgeckoBrowser.contextMenus.removeAll();
+
+    imgeckoBrowser.contextMenus.create({
+        id: MENU_PARENT_ID,
         title: "Save IMG as...",
         contexts: ["image"]
     });
 
-    formats.forEach(format => {
-        browser.contextMenus.create({
-            id: `IMGecko-${format}`,
-            parentId: "IMGeckoParent",
-            title: format.toUpperCase(),
+    const formats = await IMGeckoFormats.getMenuFormats();
+    for (const format of formats) {
+        imgeckoBrowser.contextMenus.create({
+            id: `${MENU_ITEM_PREFIX}${format.id}`,
+            parentId: MENU_PARENT_ID,
+            title: format.label,
             contexts: ["image"]
         });
-    });
-});
-
-// format validation and direct processing
-browser.contextMenus.onClicked.addListener(async (info) => {
-    const format = info.menuItemId.split("-")[1];
-
-    if (formats.includes(format)) {
-        processImage({
-            url: info.srcUrl,
-            format: format,
-            filename: `IMGecko_${Date.now()}`
-        });
     }
-});
+}
 
-function triggerDownload(blobUrl, filename, format) {
-    browser.downloads.download({
+function triggerDownload(blob, filename, extension) {
+    const blobUrl = URL.createObjectURL(blob);
+
+    return imgeckoBrowser.downloads.download({
         url: blobUrl,
-        filename: `${filename}.${format}`,
+        filename: `${filename}.${extension}`,
         saveAs: false,
         conflictAction: "uniquify"
-    }).then(() => {
+    }).finally(() => {
         setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
     });
 }
 
-async function processImage({ url, format, filename }) {
+async function processImage({ url, formatId, filename }) {
     try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        
-        const img = new Image();
-        const objectUrl = URL.createObjectURL(blob);
-        img.src = objectUrl;
-        
-        img.onload = () => {
-            const canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext("2d");
-
-            if (format === "jpg") {
-                ctx.fillStyle = "white";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-
-            ctx.drawImage(img, 0, 0);
-            const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
-            
-            canvas.toBlob((resultBlob) => {
-                const finalUrl = URL.createObjectURL(resultBlob);
-                triggerDownload(finalUrl, filename, format);
-                URL.revokeObjectURL(objectUrl);
-            }, mime, 0.9);
-        };
+        const canvas = await IMGeckoImageLoader.loadToCanvas(url);
+        const result = await IMGeckoEncoder.encode(canvas, formatId);
+        await triggerDownload(result.blob, filename, result.extension);
     } catch (error) {
-        console.error("IMGecko Firefox Conversion Error:", error);
+        console.error(`IMGecko Conversion Error [${formatId}]:`, error);
     }
 }
+
+imgeckoBrowser.runtime.onInstalled.addListener(() => {
+    buildContextMenus().catch((error) => {
+        console.error("IMGecko menu setup failed:", error);
+    });
+});
+
+if (imgeckoBrowser.runtime.onStartup) {
+    imgeckoBrowser.runtime.onStartup.addListener(() => {
+        buildContextMenus().catch((error) => {
+            console.error("IMGecko menu setup failed:", error);
+        });
+    });
+}
+
+imgeckoBrowser.contextMenus.onClicked.addListener((info) => {
+    if (!info.menuItemId || !info.menuItemId.startsWith(MENU_ITEM_PREFIX)) {
+        return;
+    }
+
+    const formatId = info.menuItemId.slice(MENU_ITEM_PREFIX.length);
+
+    if (!IMGeckoFormats.getById(formatId) || !info.srcUrl) {
+        return;
+    }
+
+    processImage({
+        url: info.srcUrl,
+        formatId,
+        filename: `IMGecko_${Date.now()}`
+    });
+});
