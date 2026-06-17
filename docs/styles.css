@@ -16,7 +16,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 40px;
+    padding: 15px 40px;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -24,6 +24,8 @@ body {
 
 .nav_icon img {
     transition: transform 0.5s ease-in-out;
+    height: 40px;
+    width: 40px;
     cursor: pointer;
 }
 
@@ -35,12 +37,13 @@ body {
     color: #ffffff;
     text-decoration: none;
     margin-left: 24px;
-    font-weight: 600;
+    font-weight: bold;
     font-size: 15px;
 }
 
 .nav_links a:hover {
     text-decoration: underline;
+    text-decoration-thickness: 2px;
 }
 
 .main_container {
@@ -55,7 +58,7 @@ body {
 .title {
     align-self: center;
     width: 100%;
-    max-width: 1000px;
+    max-width: 800px;
     margin-top: 24px;
     margin-bottom: 64px;
 }
