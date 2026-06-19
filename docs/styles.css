@@ -110,6 +110,7 @@ button.primary_button {
     max-width: 300px;
     vertical-align: top;
     margin: 10px;
+    position: relative;
 
 }
 
@@ -129,5 +130,46 @@ button.primary_button {
     margin: 0;
     line-height: 24px;
     font-size: 14px;
+}
+
+.feature_popup {
+    position: absolute;
+    bottom: 105%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    width: 260px;
+    background-color: #222222;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 12px;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 100;
+}
+
+.feature_popup img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+.feature_card:hover .feature_popup {
+    opacity: 1;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(0);
+}
+
+.feature_popup::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: #222222 transparent transparent transparent;
 }
 
