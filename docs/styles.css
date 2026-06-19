@@ -87,7 +87,7 @@ button {
 
 }
 
-button:first-child {
+button.primary_button {
     border: none;
     background-color: #6fff00;
     color: #000000;

@@ -11,11 +11,13 @@
 
         <header class="navbar">
             <div class="nav_icon">
-                <img src="images/IMGeckoIcon.png" alt="IMGecko Navbar Icon">
+                <a href="index.html" class="nav_icon">
+                    <img src="images/IMGeckoIcon.png" alt="IMGecko Navbar Icon">
+                </a>
             </div>
 
             <nav class="nav_links">
-                <a href="#">Install</a>
+                <a href="subpages/install.html">Install</a>
                 <a href="#">???</a>
             </nav>
         </header>
@@ -26,12 +28,16 @@
 
             <div class="buttons">
                 <!-- redirect to subpage to choose firefox or chrome -->
-                <button>
-                    Install IMGecko
-                </button>
-                <button>
-                    View on GitHub
-                </button>
+                <a href="subpages/install.html">
+                    <button class="primary_button">
+                        Install IMGecko
+                    </button>
+                </a>
+                <a href="https://github.com/DrMelon1/IMGecko" target="_blank" rel="noopener noreferrer">
+                    <button>
+                        View on GitHub
+                    </button>
+                </a>
             </div>
 
             <div class="features">
@@ -43,15 +49,15 @@
                 </div>
 
                 <div class="feature_card">
-                    <img src="images/BrowserIcon.png" alt="Browser Feature Icon">
-                    <h4>Browser Support</h4>
-                    <p>Works smoothly on Firefox and Chromium-based browsers.</p>
-                </div>
-
-                <div class="feature_card">
                     <img src="images/InstaIcon.png" alt="Instagram Feature Icon">
                     <h4>Instagram Fix</h4>
                     <p>Restores the ability to right-click and save images from Instagram posts.</p>
+                </div>
+
+                <div class="feature_card">
+                    <img src="images/BrowserIcon.png" alt="Browser Feature Icon">
+                    <h4>Browser Support</h4>
+                    <p>Works smoothly on Firefox and Chromium-based browsers.</p>
                 </div>
 
                 <div class="feature_card">
