@@ -7,6 +7,8 @@ body {
     align-items: center;
     padding: 0;
     margin: 0;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .navbar {
@@ -138,14 +140,17 @@ button.primary_button {
     left: 50%;
     transform: translateX(-50%) translateY(10px);
     width: 460px;
+    max-width: 100vw;
+    box-sizing: border-box;
     background-color: #222222;
     color: #ffffff;
     border-radius: 8px;
     padding: 12px;
 
+    display: none;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity 0.2s ease;
     z-index: 100;
 }
 
@@ -154,12 +159,6 @@ button.primary_button {
     height: auto;
     border-radius: 4px;
     margin-top: 8px;
-}
-
-.feature_card:hover .feature_popup {
-    opacity: 1;
-    pointer-events: none;
-    transform: translateX(-50%) translateY(0);
 }
 
 .feature_popup::after {
@@ -171,5 +170,14 @@ button.primary_button {
     border-width: 8px;
     border-style: solid;
     border-color: #222222 transparent transparent transparent;
+}
+
+@media (max-width: 500px) {
+    .feature_popup {
+        width: calc(100vw - 40px);
+        max-width: 460px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 }
 

@@ -78,6 +78,52 @@
                 
             </div>
         </main>
+        <script>
+        document.querySelectorAll(".feature_card").forEach(card => {
+            const popup = card.querySelector(".feature_popup");
+            if(!popup) return;
             
+            card.addEventListener("mouseenter", () => {
+
+                popup.style.display = "block";
+                popup.style.left = "50%";
+                popup.style.right = "auto";
+                popup.style.transform = "translateX(-50%) translateY(10px)";
+
+                const rect = popup.getBoundingClientRect();
+
+                if(rect.left < 0) {
+                    popup.style.left = "0";
+                    popup.style.transform = "translateX(0) translateY(10px)";
+
+                }
+                else if(rect.right > window.innerWidth) {
+                    popup.style.left = "auto";
+                    popup.style.right = "0";
+                    popup.style.transform = "translateX(0) translateY(10px)";
+                }
+
+                requestAnimationFrame(() => {
+                    popup.style.opacity = "1";
+                    popup.style.transform = popup.style.transform.replace("translateY(10px)", "translateY(0)");
+                })
+            });
+
+            card.addEventListener("mouseleave", () => {
+
+                popup.style.opacity = "0";
+
+                setTimeout(() => {
+                    if(!card.matches(":hover")) {   
+                        popup.style.display = "none";     
+                        popup.style.left = "";
+                        popup.style.right = "";
+                        popup.style.transform = "";
+                    }
+                }, 200);
+            });
+        });       
+        </script>
+
     </body>
 </html>
