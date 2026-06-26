@@ -1,3 +1,5 @@
+/* index */
+
 body {
     background-color: #1a1a1a;
     color: #ffffff;
@@ -181,3 +183,90 @@ button.primary_button {
     }
 }
 
+/* Install */
+
+.install_title {
+    font-size: 40px;
+    margin-top: 40px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.install_subtitle {
+    color: #aaaaaa;
+    font-size: 18px;
+    word-spacing: -10%;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.store_buttons {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 50px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.store_button {
+    background-color: #ffffff;
+    color: #000000;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 12px 12px;
+    border-radius: 50px;
+    width: 280px;
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+
+.store_icon {
+    width: 64px !important;
+    height: 64px !important;
+    margin-right: 12px;
+}
+
+.store_text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.store_label {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.store_name {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.note {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 24px;
+    box-sizing: border-box;
+    text-align: left;
+    border: 3px solid #6fff00;
+    background-color: rgba(0, 255, 115, 0.05);
+    color: #6fff00;
+}
+
+.note h2 {
+    font-size: 20px;
+}
+
+.note p {
+    font-size: 16px;
+    color: #6fff00;
+    line-height: 20px;
+}
