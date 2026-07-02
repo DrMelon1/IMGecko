@@ -220,7 +220,6 @@ button.primary_button {
     border-radius: 50px;
     width: 280px;
     justify-content: flex-start;
-    box-sizing: border-box;
 }
 
 .store_icon {
